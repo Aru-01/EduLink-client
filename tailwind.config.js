@@ -4,13 +4,15 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        "inria-sans": ['"Inria Sans"', "sans-serif"],
+        "inria-serif": ['"Inria Serif"', "serif"],
         lora: ["Lora", "serif"],
-        roboto: ['Roboto', 'sans-serif']
+        roboto: ["Roboto", "sans-serif"],
       },
     },
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["acid", "lofi", "cmyk"],
+    themes: ["garden", "lofi", "cmyk"],
   },
 };
