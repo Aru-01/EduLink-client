@@ -6,25 +6,21 @@ import {
   Card,
   Checkbox,
   Input,
-  Option,
   Typography,
 } from "@material-tailwind/react";
 
 import { useForm } from "react-hook-form";
 import { useContext, useState } from "react";
-import { AuthContext } from "../../Providers/AuthProviders";
 import { updateProfile } from "firebase/auth";
-import auth from "../../firebase/firebase.config";
+import { auth, storage } from "../../firebase/firebase.config";
 import Swal from "sweetalert2";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-// import useAxiosPublic from "../../hooks/useAxiosPublic";
-
-// const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
-// const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
+import { AuthContext } from "../../Providers/AuthProviders";
+import ConvertToBase64 from "../../hooks/base64/ConvertToBase64";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 const RegisterTeacher = () => {
-  // const { createUser } = useContext(AuthContext);
+  const { createUser } = useContext(AuthContext);
   const navigate = useNavigate();
-  // const axiosPublic = useAxiosPublic();
 
   const [showPassword, setShowPassword] = useState(false);
   const {
@@ -33,59 +29,48 @@ const RegisterTeacher = () => {
     formState: { errors },
   } = useForm();
   const onSubmit = async (data) => {
-    console.log(data);
+    if (!data.photo.length) {
+      alert("Please upload a photo.");
+      return;
+    }
+    const file = data.photo[0];
+    const base64 = await ConvertToBase64(file);
+    const { name, email, password, teacherID, department, phone } = data;
+    const userInfo = {
+      name,
+      email,
+      teacherID,
+      department,
+      phone,
+      photo: base64,
+      password,
+      role: "Teacher",
+    };
+    // console.log(userInfo);
+    createUser(email, password)
+      .then(async (res) => {
+        const storageRef = ref(storage, `users/${res.user.uid}/profile.jpg`);
+        await uploadString(storageRef, base64, "data_url");
+        const photoURL = await getDownloadURL(storageRef);
+
+        await updateProfile(auth.currentUser, {
+          displayName: name,
+          photoURL: photoURL,
+        });
+
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Registration Success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        navigate(location?.state ? location?.state : "/");
+      })
+      .catch((error) => {
+        console.error("Error creating user:", error.message);
+      });
   };
-  // const onSubmit = async (data) => {
-  //   // const imageFile = { image: data.photo[0] };
-  //   // const imgRes = await axiosPublic.post(image_hosting_api, imageFile, {
-  //   // headers: {
-  //   //   "content-type": "multipart/form-data",
-  //   // },
-  //   // });
-  //   // if (imgRes.data.success) {
-  //   //   const name = data.name;
-  //   //   const email = data.email;
-  //   //   const password = data.password;
-  //   //   const photo = imgRes.data.data.display_url;
-  //   //   console.log(name, email, password, photo);
-  //   //   createUser(email, password)
-  //   //     .then((res) => {
-  //   //       // const user = res.user;
-  //   //       // console.log(user);
-  //   //       updateProfile(auth.currentUser, {
-  //   //         displayName: name,
-  //   //         photoURL: photo,
-  //   //       })
-  //   //         .then(() => {
-  //   //           const userInfo = {
-  //   //             name: data.name,
-  //   //             email: data.email,
-  //   //             image: data.photo,
-  //   //           };
-  //   //           axiosPublic.post("/user", userInfo).then((res) => {
-  //   //             if (res.data.insertedId) {
-  //   //               Swal.fire({
-  //   //                 position: "center",
-  //   //                 icon: "success",
-  //   //                 title: "Sign Up complete",
-  //   //                 showConfirmButton: false,
-  //   //                 timer: 1500,
-  //   //               });
-  //   //               navigate(location?.state ? location?.state : "/");
-  //   //             }
-  //   //           });
-  //   //           // User information updated successfully
-  //   //           // console.log("User created with name and photo:",);
-  //   //         })
-  //   //         .catch((error) => {
-  //   //           console.error("Error updating user information:", error.message);
-  //   //         });
-  //   //     })
-  //   //     .catch((error) => {
-  //   //       console.log(error.message);
-  //   //     });
-  //   // }
-  // };
   return (
     <div className="my-20">
       <Helmet>
@@ -139,12 +124,12 @@ const RegisterTeacher = () => {
                 <Input
                   size="lg"
                   type="number"
-                  name="roll"
-                  {...register("roll", { required: true })}
+                  name="teacherID"
+                  {...register("teacherID", { required: true })}
                   placeholder="Please Enter Teacher ID"
                   className="!border-t-blue-gray-200 focus:!border-t-gray-900"
                 />
-                {errors.roll?.type === "required" && (
+                {errors.teacherID?.type === "required" && (
                   <p className="text-red-600">Teacher ID is required</p>
                 )}
               </div>
@@ -308,10 +293,7 @@ const RegisterTeacher = () => {
             </Typography>
             <Typography color="gray" className="mt-4 text-center font-normal">
               Already have an account?{" "}
-              <NavLink
-                to="/login"
-                className="underline text-red-500 font-bold"
-              >
+              <NavLink to="/login" className="underline text-red-500 font-bold">
                 Login
               </NavLink>
             </Typography>

@@ -1,76 +1,55 @@
-import { createContext, useEffect, useState } from "react";
-import auth from "../firebase/firebase.config";
 import {
-  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
 } from "firebase/auth";
-// import useAxiosPublic from "../hooks/useAxiosPublic";
+import { createContext, useEffect, useState } from "react";
+import {auth} from "../firebase/firebase.config";
 
-export const AuthContext = createContext(null);
-const AuthProviders = ({ children }) => {
+export const AuthContext = createContext();
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const googleProvider = new GoogleAuthProvider();
-  // const axiosPublic = useAxiosPublic()
 
   //   create user
+
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  // google sign in
-  const googleSignIn = () => {
-    setLoading(true);
-    return signInWithPopup(auth, googleProvider);
-  };
+  //   sign In / login User
 
-  //   login user
   const loginUser = (email, password) => {
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  //   logOut user
+  //   sign Out / Log out
   const logOut = () => {
     setLoading(true);
     return signOut(auth);
   };
 
-  //   user onauth state
+  // google sign in
+
+
+  //   on Auth State
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      console.log(`current user `, currentUser);
-      // if (currentUser) {
-      //   const userInfo = { email: currentUser.email };
-      //   console.log(userInfo);
-      //   axiosPublic.post("/jwt", userInfo).then((res) => {
-      //     // console.log(res.data);
-      //     if (res.data.token) {
-      //       localStorage.setItem("access-token", res.data.token);
-      //     }
-      //   });
-      // } else {
-      //   localStorage.removeItem("access-token");
-      // }
       setLoading(false);
+      console.log(`on auth state user ${currentUser}`);
     });
     return () => {
-      return unsubscribe();
+      return unSubscribe();
     };
   }, []);
-  // }, [axiosPublic]);
-
   const authInfo = {
     user,
     loading,
     createUser,
-    googleSignIn,
     loginUser,
     logOut,
   };
@@ -79,4 +58,4 @@ const AuthProviders = ({ children }) => {
   );
 };
 
-export default AuthProviders;
+export default AuthProvider;

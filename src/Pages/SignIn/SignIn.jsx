@@ -3,13 +3,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Card, Input, Typography } from "@material-tailwind/react";
 import Container from "../../Components/Container/Container";
 import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 import { useContext } from "react";
 import { AuthContext } from "../../Providers/AuthProviders";
-import Swal from "sweetalert2";
 
 const SignIn = () => {
-  // const { loginUser } = useContext(AuthContext);
-  // const navigate = useNavigate();
+  const { loginUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -20,23 +20,23 @@ const SignIn = () => {
   const onSubmit = (data) => {
     const email = data.email;
     const password = data.password;
-    console.log(email, password);
+    // console.log(email, password);
     // firebase login
-    // loginUser(email, password)
-    //   .then((res) => {
-    //     console.log(res.user);
-    //     Swal.fire({
-    //       position: "center",
-    //       icon: "success",
-    //       title: "Sign In Successful",
-    //       showConfirmButton: true,
-    //       timer: 1200,
-    //     });
-    //     navigate(`${location.state ? location.state : "/"}`);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error.message);
-    //   });
+    loginUser(email, password)
+      .then((res) => {
+        // console.log(res.user);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Login In Successful",
+          showConfirmButton: true,
+          timer: 1200,
+        });
+        navigate(`${location.state ? location.state : "/"}`);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   };
   return (
     <div className="my-12">
