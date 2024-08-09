@@ -18,10 +18,11 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { AuthContext } from "../../Providers/AuthProviders";
 import ConvertToBase64 from "../../hooks/base64/ConvertToBase64";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import useAxiosPublic from "../../hooks/useAxios/useAxiosPublic";
 const RegisterTeacher = () => {
   const { createUser } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const axiosPublic = useAxiosPublic();
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
@@ -57,15 +58,18 @@ const RegisterTeacher = () => {
           displayName: name,
           photoURL: photoURL,
         });
-
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Registration Success",
-          showConfirmButton: false,
-          timer: 1500,
+        axiosPublic.post("/user", userInfo).then((res) => {
+          if (res.data.insertedId) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Sign Up complete",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            navigate(location?.state ? location?.state : "/");
+          }
         });
-        navigate(location?.state ? location?.state : "/");
       })
       .catch((error) => {
         console.error("Error creating user:", error.message);

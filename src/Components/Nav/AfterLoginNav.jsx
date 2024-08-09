@@ -93,9 +93,7 @@ const AfterLoginNav = () => {
               </Link>
             </li>
             <li>
-              <Link to="#">
-                Attend Test
-              </Link>
+              <Link to="#">Attend Test</Link>
               <ul className="p-2">
                 <li>
                   <Link to="/class-test">Class Test</Link>
@@ -106,29 +104,27 @@ const AfterLoginNav = () => {
               </ul>
             </li>
             <li>
-              <Link to="/join-as-guest-teacher" className={getLinkClass("/join-as-guest-teacher")}>
+              <Link
+                to="/join-as-guest-teacher"
+                className={getLinkClass("/join-as-guest-teacher")}
+              >
                 Join as a Guest Teacher
               </Link>
             </li>
           </ul>
         </div>
-        {/* logo  */}
+        {/* logo */}
         <div>
           <Link
             to="/"
             className="flex justify-center items-center hover:underline"
           >
             <img
-              className="hidden md:block md:w-[40px] md:h-[30px] lg:w-[80px] lg:h-[70px] rounded-2xl ml-4"
+              className="hidden md:block md:w-[40px] md:h-[30px] lg:w-[75px] lg:h-[63px] ml-4"
               src={logo}
               alt="logo"
-              width="70"
-              height="70"
             />
-            <h5
-              className="ml-2 md:text-lg lg:text-3xl font-bold bg-transparent"
-              style={{ textShadow: "0 8px 6px rgba(34, 87, 122, .7)" }}
-            >
+            <h5 className="-ml-2 md:text-lg lg:text-2xl font-bold transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110">
               EDULINK
             </h5>
           </Link>
@@ -160,7 +156,10 @@ const AfterLoginNav = () => {
             </details>
           </li>
           <li>
-            <Link to="/join-as-guest-teacher" className={getLinkClass("/join-as-guest-teacher")}>
+            <Link
+              to="/join-as-guest-teacher"
+              className={getLinkClass("/join-as-guest-teacher")}
+            >
               Join as a Guest Teacher
             </Link>
           </li>
@@ -180,10 +179,16 @@ const AfterLoginNav = () => {
           {showLinks && (
             <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white right-0 top-12 text-sm">
               <div className="flex flex-col cursor-pointer">
-                <Link to="/profile" className="px-4 py-3 hover:bg-neutral-100 transition font-semibold">
+                <Link
+                  to="/profile"
+                  className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                >
                   Profile
                 </Link>
-                <Link onClick={handleLogOut} className="px-4 py-3 hover:bg-neutral-100 transition font-semibold">
+                <Link
+                  onClick={handleLogOut}
+                  className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                >
                   Logout
                 </Link>
               </div>

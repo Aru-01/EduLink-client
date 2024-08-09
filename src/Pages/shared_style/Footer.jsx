@@ -23,8 +23,8 @@ const Footer = () => {
           className="
        justify-self-center  lg:justify-self-end"
         >
-          <div className="bg-[#0F4C81] text-white py-4 md:py-6 px-3 hover:bg-slate-500  cursor-pointer rounded-lg md:text-lg font-semibold">
-            Contact & services
+          <div className="bg-[#0587f9] text-white py-3 md:py-4 px-3 hover:bg-transparent hover:text-black hover:border-black hover:border-2  cursor-pointer rounded-lg md:text-lg font-semibold">
+            Contact & Services
           </div>
         </nav>
       </footer>

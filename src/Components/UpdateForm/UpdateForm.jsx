@@ -1,29 +1,25 @@
-import { Helmet } from "react-helmet";
-import Container from "../../Components/Container/Container";
-import { NavLink, useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
-  Checkbox,
   Input,
+  Textarea,
   Typography,
 } from "@material-tailwind/react";
-import { useForm } from "react-hook-form";
-import { useContext, useState } from "react";
+import Container from "../Container/Container";
 import Swal from "sweetalert2";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import ConvertToBase64 from "../../hooks/base64/ConvertToBase64";
-import { AuthContext } from "../../Providers/AuthProviders";
-import { updateProfile } from "firebase/auth";
-import { auth, storage } from "../../firebase/firebase.config";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { useForm } from "react-hook-form";
+import { IoClose } from "react-icons/io5"; // Import close icon
 import useAxiosPublic from "../../hooks/useAxios/useAxiosPublic";
+import { updateProfile } from "firebase/auth";
+import { useState } from "react";
+import { auth } from "../../firebase/firebase.config";
 
-const RegisterStudent = () => {
-  const { createUser } = useContext(AuthContext);
+const UpdateForm = ({ userData, closeModal }) => {
   const axiosPublic = useAxiosPublic();
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
+
+  const [selectedDepartment, setSelectedDepartment] = useState(
+    userData.department
+  );
   const {
     register,
     handleSubmit,
@@ -31,25 +27,9 @@ const RegisterStudent = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    if (!data.photo.length) {
-      alert("Please upload a photo.");
-      return;
-    }
+    const { name, semester, phone, guardianPhone, dob, bio } = data;
 
-    const file = data.photo[0];
-    const base64 = await ConvertToBase64(file);
-    const {
-      name,
-      email,
-      password,
-      roll,
-      registration,
-      department,
-      semester,
-      phone,
-      guardianPhone,
-    } = data;
-
+    // Validation for phone numbers
     if (phone === guardianPhone) {
       Swal.fire({
         icon: "error",
@@ -61,51 +41,44 @@ const RegisterStudent = () => {
 
     const userInfo = {
       name,
-      roll,
-      registration,
-      department,
       semester,
-      email,
       phone,
-      photo: base64,
       guardianPhone,
-      password,
-      role: "Student",
+      dob,
+      bio,
     };
 
-    createUser(email, password)
-      .then(async (res) => {
-        const storageRef = ref(storage, `users/${res.user.uid}/profile.jpg`);
-        await uploadString(storageRef, base64, "data_url");
-        const photoURL = await getDownloadURL(storageRef);
+    try {
+      const response = await axiosPublic.patch(
+        `/user?email=${userData.email}`,
+        userInfo
+      );
 
-        await updateProfile(auth.currentUser, {
-          displayName: name,
-          photoURL: photoURL,
+      // Adjust this to check for the new response message
+      if (response.data.message.includes("User updated successfully")) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Update complete",
+          showConfirmButton: false,
+          timer: 1500,
         });
-        axiosPublic.post("/user", userInfo).then((res) => {
-          if (res.data.insertedId) {
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Sign Up complete",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-            navigate(location?.state ? location?.state : "/");
-          }
-        });
-      })
-      .catch((error) => {
-        console.error("Error creating user:", error.message);
+
+        closeModal(); // Close the modal after successful update
+        await updateProfile(auth.currentUser, { displayName: name });
+      }
+    } catch (error) {
+      console.error("Error updating user:", error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "There was a problem updating the user information.",
       });
+    }
   };
 
   return (
-    <div className="my-20">
-      <Helmet>
-        <title>EduLink | Register</title>
-      </Helmet>
+    <div className="my-20 relative">
       <Container>
         <div className="flex justify-center gap-8">
           <Card
@@ -113,12 +86,19 @@ const RegisterStudent = () => {
             shadow={false}
             className="border p-10 shadow-xl border-blue-gray-200 bg-[#F4FDFF] w-full max-w-3xl"
           >
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+            >
+              <IoClose size={24} />
+            </button>
+
             <Typography
               variant="h4"
               className="text-center text-2xl font-black"
               color="blue-gray"
             >
-              Register as a Student
+              Edit Info
             </Typography>
 
             <form
@@ -134,6 +114,7 @@ const RegisterStudent = () => {
                   name="name"
                   {...register("name", { required: true })}
                   placeholder="Enter Your Full Name"
+                  defaultValue={userData.name}
                   className="!border-t-blue-gray-200 focus:!border-t-gray-900"
                   labelProps={{
                     className: "before:content-none after:content-none",
@@ -141,6 +122,27 @@ const RegisterStudent = () => {
                 />
                 {errors.name?.type === "required" && (
                   <p className="text-red-600">Name is required</p>
+                )}
+              </div>
+              {/* Bio Input */}
+              <div className="col-span-full">
+                <Typography variant="h6" color="blue-gray">
+                  Bio
+                </Typography>
+                <Textarea
+                  type="text"
+                  name="bio"
+                  size="lg"
+                  defaultValue={userData.bio} // Set the default value to user's bio
+                  {...register("bio", { required: true })}
+                  placeholder="Enter a short bio"
+                  className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                  labelProps={{
+                    className: "before:content-none after:content-none",
+                  }}
+                />
+                {errors.bio?.type === "required" && (
+                  <p className="text-red-600">Bio is required</p>
                 )}
               </div>
               <div className="col-span-full sm:col-span-1">
@@ -151,16 +153,13 @@ const RegisterStudent = () => {
                   size="lg"
                   type="number"
                   name="roll"
-                  {...register("roll", { required: true })}
-                  placeholder="Enter Your Board Roll"
+                  defaultValue={userData.roll}
+                  disabled
                   className="!border-t-blue-gray-200 focus:!border-t-gray-900"
                   labelProps={{
                     className: "before:content-none after:content-none",
                   }}
                 />
-                {errors.roll?.type === "required" && (
-                  <p className="text-red-600">Roll is required</p>
-                )}
               </div>
               <div className="col-span-full sm:col-span-1">
                 <Typography variant="h6" color="blue-gray">
@@ -170,18 +169,13 @@ const RegisterStudent = () => {
                   type="number"
                   size="lg"
                   name="registration"
-                  {...register("registration", { required: true })}
-                  placeholder="Enter Your Registration Number"
+                  defaultValue={userData.registration}
+                  disabled
                   className="!border-t-blue-gray-200 focus:!border-t-gray-900"
                   labelProps={{
                     className: "before:content-none after:content-none",
                   }}
                 />
-                {errors.registration?.type === "required" && (
-                  <p className="text-red-600">
-                    Registration number is required
-                  </p>
-                )}
               </div>
               <div className="col-span-full sm:col-span-1">
                 <Typography variant="h6" color="blue-gray">
@@ -189,10 +183,16 @@ const RegisterStudent = () => {
                 </Typography>
                 <select
                   name="department"
+                  value={selectedDepartment}
+                  onChange={(e) => {
+                    setSelectedDepartment(e.target.value);
+                  }}
                   {...register("department", { required: true })}
                   className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full py-2 px-3 rounded-md"
                 >
-                  <option value="">Select one</option>
+                  <option value="" disabled>
+                    Select one
+                  </option>
                   <option value="CST">CST</option>
                   <option value="Civil">Civil</option>
                   <option value="Power">Power</option>
@@ -200,9 +200,6 @@ const RegisterStudent = () => {
                   <option value="Mechanical">Mechanical</option>
                   <option value="Architecture">Architecture</option>
                 </select>
-                {errors.department?.type === "required" && (
-                  <p className="text-red-600">Department is required</p>
-                )}
               </div>
               <div className="col-span-full sm:col-span-1">
                 <Typography variant="h6" color="blue-gray">
@@ -212,6 +209,7 @@ const RegisterStudent = () => {
                   type="number"
                   name="semester"
                   size="lg"
+                  defaultValue={userData.semester}
                   {...register("semester", { required: true })}
                   placeholder="Enter your semester"
                   className="!border-t-blue-gray-200 focus:!border-t-gray-900"
@@ -231,6 +229,7 @@ const RegisterStudent = () => {
                   type="text"
                   name="phone"
                   size="lg"
+                  defaultValue={userData.phone}
                   {...register("phone", {
                     required: true,
                     pattern: {
@@ -260,6 +259,7 @@ const RegisterStudent = () => {
                   type="text"
                   name="guardianPhone"
                   size="lg"
+                  defaultValue={userData.guardianPhone}
                   {...register("guardianPhone", {
                     required: true,
                     pattern: {
@@ -283,7 +283,27 @@ const RegisterStudent = () => {
                   <p className="text-red-600">{errors.guardianPhone.message}</p>
                 )}
               </div>
-              <div className="col-span-full">
+              {/* Date of Birth Input */}
+              <div className="col-span-full sm:col-span-1">
+                <Typography variant="h6" color="blue-gray">
+                  Date of Birth
+                </Typography>
+                <Input
+                  type="date"
+                  name="dob"
+                  size="lg"
+                  defaultValue={userData.dob} // Set the default value to user's DOB
+                  {...register("dob", { required: true })}
+                  className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                  labelProps={{
+                    className: "before:content-none after:content-none",
+                  }}
+                />
+                {errors.dob?.type === "required" && (
+                  <p className="text-red-600">Date of birth is required</p>
+                )}
+              </div>
+              <div className="col-span-full sm:col-span-2">
                 <Typography variant="h6" color="blue-gray">
                   Enter Your Email
                 </Typography>
@@ -291,110 +311,20 @@ const RegisterStudent = () => {
                   type="email"
                   name="email"
                   size="lg"
-                  {...register("email", { required: true })}
-                  placeholder="Enter your email"
+                  defaultValue={userData.email}
+                  disabled
                   className="!border-t-blue-gray-200 focus:!border-t-gray-900"
                   labelProps={{
                     className: "before:content-none after:content-none",
                   }}
                 />
-                {errors.email?.type === "required" && (
-                  <p className="text-red-600">Email is required</p>
-                )}
-              </div>
-              <div className="col-span-full">
-                <Typography variant="h6" color="blue-gray">
-                  Password
-                </Typography>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    size="lg"
-                    {...register("password", { required: true })}
-                    placeholder="Please set a strong password"
-                    className="!border-t-blue-gray-200 focus:!border-t-gray-900 pr-10"
-                  />
-                  <div
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <AiFillEyeInvisible size={20} />
-                    ) : (
-                      <AiFillEye size={20} />
-                    )}
-                  </div>
-                </div>
-                {errors.password?.type === "required" && (
-                  <p className="text-red-600">Password is required</p>
-                )}
-              </div>
-              <div className="col-span-full">
-                <Typography variant="h6" color="blue-gray">
-                  Upload Your Photo
-                </Typography>
-                <Input
-                  type="file"
-                  name="photo"
-                  size="lg"
-                  placeholder="Upload your photo"
-                  {...register("photo")}
-                  className="!border-t-blue-gray-200 focus:!border-t-gray-900"
-                  labelProps={{
-                    className: "before:content-none after:content-none",
-                  }}
-                />
-              </div>
-              <div className="col-span-full">
-                <Checkbox
-                  name="terms"
-                  {...register("terms", { required: true })}
-                  label={
-                    <Typography
-                      variant="small"
-                      color="gray"
-                      className="flex items-center font-normal"
-                    >
-                      <span className="ml-2">
-                        I agree to the
-                        <a
-                          href="#"
-                          className="font-medium transition-colors hover:text-gray-900"
-                        >
-                          &nbsp;Terms and Conditions
-                        </a>
-                      </span>
-                    </Typography>
-                  }
-                  containerProps={{ className: "mt-2" }}
-                />
-                {errors.terms?.type === "required" && (
-                  <p className="text-red-600">You must agree to the terms</p>
-                )}
               </div>
               <div className="col-span-full">
                 <Button className="mt-6 bg-black" fullWidth type="submit">
-                  Register
+                  Update
                 </Button>
               </div>
             </form>
-
-            <Typography color="gray" className="mt-4 text-center font-normal">
-              Register as a Teacher{" "}
-              <NavLink
-                to="/signup-teacher"
-                className="underline text-red-500 font-bold"
-              >
-                account.?
-              </NavLink>
-            </Typography>
-            <Typography color="gray" className="mt-4 text-center font-normal">
-              Already have an account?{" "}
-              <NavLink to="/login" className="underline text-red-500 font-bold">
-                Login
-              </NavLink>
-            </Typography>
           </Card>
         </div>
       </Container>
@@ -402,4 +332,4 @@ const RegisterStudent = () => {
   );
 };
 
-export default RegisterStudent;
+export default UpdateForm;

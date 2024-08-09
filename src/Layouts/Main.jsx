@@ -5,9 +5,11 @@ import Footer from "../Pages/shared_style/Footer";
 const Main = () => {
   return (
     <div>
-      <Nav/>
-      <Outlet />
-      <Footer/>
+      <Nav />
+      <div className="">
+        <Outlet />
+      </div>
+      <Footer />
     </div>
   );
 };

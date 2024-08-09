@@ -18,8 +18,11 @@ const Banner = () => {
   const bannerBtn = (
     <>
       <Link to="/explore">
-        <button className="bg-[#0F4C81] text-white py-4 md:py-6 px-4 md:mt-6 md:px-6  hover:bg-slate-500  cursor-pointer rounded-lg md:rounded-xl md:text-lg text-sm font-bold">
-          Explore More
+        <button className="group relative m-1 cursor-pointer overflow-hidden rounded-md border-2 border-[#80AF81]  py-3 md:py-4 px-4 md:mt-6 md:px-5 md:text-lg text-sm font-bold ">
+          <span className="ease absolute top-1/2 h-0 w-64 origin-center -translate-x-20 rotate-45  bg-gradient-to-r from-[#508D4E] to-[#1A5319] transition-all duration-300 group-hover:h-64 group-hover:-translate-y-32"></span>
+          <span className="ease relative text-[#80AF81] transition duration-300 group-hover:text-white">
+            Explore More
+          </span>
         </button>
       </Link>
     </>

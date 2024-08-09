@@ -73,23 +73,18 @@ const BeforeLoginNav = () => {
             </li>
           </ul>
         </div>
-        {/* logo  */}
+        {/* logo */}
         <div>
           <Link
             to="/"
             className="flex justify-center items-center hover:underline"
           >
             <img
-              className="hidden md:block md:w-[40px] md:h-[30px] lg:w-[80px] lg:h-[70px] rounded-2xl ml-4"
+              className="hidden md:block md:w-[40px] md:h-[30px] lg:w-[75px] lg:h-[63px] ml-4"
               src={logo}
               alt="logo"
-              width="70"
-              height="70"
             />
-            <h5
-              className="ml-2 md:text-lg lg:text-3xl font-bold bg-transparent"
-              style={{ textShadow: "0 8px 6px rgba(34, 87, 122, .7)" }}
-            >
+            <h5 className="-ml-2 md:text-lg lg:text-2xl font-bold transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110">
               EDULINK
             </h5>
           </Link>
