@@ -7,14 +7,14 @@ import {
 } from "@material-tailwind/react";
 import Container from "../Container/Container";
 import Swal from "sweetalert2";
-import { useForm } from "react-hook-form";
-import { IoClose } from "react-icons/io5"; // Import close icon
-import useAxiosPublic from "../../hooks/useAxios/useAxiosPublic";
 import { updateProfile } from "firebase/auth";
-import { useState } from "react";
 import { auth } from "../../firebase/firebase.config";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import useAxiosPublic from "../../hooks/useAxios/useAxiosPublic";
+import { IoClose } from "react-icons/io5";
 
-const UpdateForm = ({ userData, closeModal }) => {
+const TeacherPUpdateForm = ({ userData, closeModal }) => {
   const axiosPublic = useAxiosPublic();
 
   const [selectedDepartment, setSelectedDepartment] = useState(
@@ -27,23 +27,11 @@ const UpdateForm = ({ userData, closeModal }) => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    const { name, semester, phone, guardianPhone, dob, bio } = data;
-
-    // Validation for phone numbers
-    if (phone === guardianPhone) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Phone number and guardian phone number cannot be the same!",
-      });
-      return;
-    }
+    const { name, phone, dob, bio } = data;
 
     const userInfo = {
       name,
-      semester,
       phone,
-      guardianPhone,
       dob,
       bio,
     };
@@ -147,82 +135,6 @@ const UpdateForm = ({ userData, closeModal }) => {
               </div>
               <div className="col-span-full sm:col-span-1">
                 <Typography variant="h6" color="blue-gray">
-                  Your Board Roll
-                </Typography>
-                <Input
-                  size="lg"
-                  type="number"
-                  name="roll"
-                  defaultValue={userData.roll}
-                  disabled
-                  className="!border-t-blue-gray-200 focus:!border-t-gray-900"
-                  labelProps={{
-                    className: "before:content-none after:content-none",
-                  }}
-                />
-              </div>
-              <div className="col-span-full sm:col-span-1">
-                <Typography variant="h6" color="blue-gray">
-                  Your Registration Number
-                </Typography>
-                <Input
-                  type="number"
-                  size="lg"
-                  name="registration"
-                  defaultValue={userData.registration}
-                  disabled
-                  className="!border-t-blue-gray-200 focus:!border-t-gray-900"
-                  labelProps={{
-                    className: "before:content-none after:content-none",
-                  }}
-                />
-              </div>
-              <div className="col-span-full sm:col-span-1">
-                <Typography variant="h6" color="blue-gray">
-                  Choose Your Department:
-                </Typography>
-                <select
-                  name="department"
-                  value={selectedDepartment}
-                  onChange={(e) => {
-                    setSelectedDepartment(e.target.value);
-                  }}
-                  {...register("department", { required: true })}
-                  className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full py-2 px-3 rounded-md"
-                >
-                  <option value="" disabled>
-                    Select one
-                  </option>
-                  <option value="CST">CST</option>
-                  <option value="Civil">Civil</option>
-                  <option value="Power">Power</option>
-                  <option value="Electrical">Electrical</option>
-                  <option value="Mechanical">Mechanical</option>
-                  <option value="Architecture">Architecture</option>
-                </select>
-              </div>
-              <div className="col-span-full sm:col-span-1">
-                <Typography variant="h6" color="blue-gray">
-                  Semester
-                </Typography>
-                <Input
-                  type="number"
-                  name="semester"
-                  size="lg"
-                  defaultValue={userData.semester}
-                  {...register("semester", { required: true })}
-                  placeholder="Enter your semester"
-                  className="!border-t-blue-gray-200 focus:!border-t-gray-900"
-                  labelProps={{
-                    className: "before:content-none after:content-none",
-                  }}
-                />
-                {errors.semester?.type === "required" && (
-                  <p className="text-red-600">Semester is required</p>
-                )}
-              </div>
-              <div className="col-span-full sm:col-span-1">
-                <Typography variant="h6" color="blue-gray">
                   Your Phone Number
                 </Typography>
                 <Input
@@ -249,38 +161,6 @@ const UpdateForm = ({ userData, closeModal }) => {
                 )}
                 {errors.phone?.type === "pattern" && (
                   <p className="text-red-600">{errors.phone.message}</p>
-                )}
-              </div>
-              <div className="col-span-full sm:col-span-1">
-                <Typography variant="h6" color="blue-gray">
-                  Guardian Phone Number
-                </Typography>
-                <Input
-                  type="text"
-                  name="guardianPhone"
-                  size="lg"
-                  defaultValue={userData.guardianPhone}
-                  {...register("guardianPhone", {
-                    required: true,
-                    pattern: {
-                      value: /^01\d{9}$/,
-                      message:
-                        "Guardian's phone number must start with '01' and be 11 digits long",
-                    },
-                  })}
-                  placeholder="Enter guardian's phone number"
-                  className="!border-t-blue-gray-200 focus:!border-t-gray-900"
-                  labelProps={{
-                    className: "before:content-none after:content-none",
-                  }}
-                />
-                {errors.guardianPhone?.type === "required" && (
-                  <p className="text-red-600">
-                    Guardian phone number is required
-                  </p>
-                )}
-                {errors.guardianPhone?.type === "pattern" && (
-                  <p className="text-red-600">{errors.guardianPhone.message}</p>
                 )}
               </div>
               {/* Date of Birth Input */}
@@ -332,4 +212,4 @@ const UpdateForm = ({ userData, closeModal }) => {
   );
 };
 
-export default UpdateForm;
+export default TeacherPUpdateForm;

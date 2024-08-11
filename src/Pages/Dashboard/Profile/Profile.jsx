@@ -2,10 +2,11 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../../Providers/AuthProviders";
 import useAxiosPublic from "../../../hooks/useAxios/useAxiosPublic";
 import profile from "../../../assets/profile/avater.png";
-import {  useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import "./Profile.css";
 import { Helmet } from "react-helmet";
-import UpdateForm from "../../../Components/UpdateForm/UpdateForm";
+import StudentPUpdateForm from "../../../Components/ProfileUpdateForm/StudentPUpdateForm";
+import TeacherPUpdateForm from "../../../Components/ProfileUpdateForm/TeacherPUpdateForm";
 
 const Profile = () => {
   const { user } = useContext(AuthContext);
@@ -19,8 +20,8 @@ const Profile = () => {
       return res.data;
     },
   });
-  // console.log(dbuser[0]);
   const role = dbuser[0]?.role;
+  console.log(role);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -173,6 +174,14 @@ const Profile = () => {
                         {dbuser[0]?.email}
                       </dd>
                     </div>
+                    <div className="flex flex-col py-3">
+                      <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">
+                        Date Of Birth
+                      </dt>
+                      <dd className="text-lg font-semibold">
+                        {dbuser[0]?.dob ? dbuser[0]?.dob : "N/A"}
+                      </dd>
+                    </div>
                   </dl>
                 </div>
                 <div className="w-full">
@@ -216,9 +225,21 @@ const Profile = () => {
         </div>
       </div>
       {/* Modal */}
-      {isModalOpen && (
+      {isModalOpen && dbuser[0]?.role === "Student" && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <UpdateForm userData={dbuser[0]} closeModal={handleModalClose} />
+          <StudentPUpdateForm
+            userData={dbuser[0]}
+            closeModal={handleModalClose}
+          />
+        </div>
+      )}
+
+      {isModalOpen && dbuser[0]?.role === "Teacher" && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <TeacherPUpdateForm
+            userData={dbuser[0]}
+            handleModalClose={handleModalClose}
+          />
         </div>
       )}
     </section>

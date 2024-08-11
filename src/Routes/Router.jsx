@@ -6,6 +6,8 @@ import SignIn from "../Pages/SignIn/SignIn";
 import RegisterStudent from "../Pages/Register/RegisterStudent";
 import RegisterTeacher from "../Pages/Register/RegisterTeacher";
 import Profile from "../Pages/Dashboard/Profile/Profile";
+import AllProjects from "../Pages/AllProjects/AllProjects";
+import JoinGeustTeacher from "../Pages/JoinGeustTeacher/JoinGeustTeacher";
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +18,14 @@ export const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/projects",
+        element: <AllProjects />,
+      },
+      {
+        path: "/join-as-guest-teacher",
+        element: <JoinGeustTeacher />,
       },
       {
         path: "/profile",
