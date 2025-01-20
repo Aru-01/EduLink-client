@@ -8,6 +8,8 @@ import RegisterTeacher from "../Pages/Register/RegisterTeacher";
 import Profile from "../Pages/Dashboard/Profile/Profile";
 import AllProjects from "../Pages/AllProjects/AllProjects";
 import JoinGeustTeacher from "../Pages/JoinGeustTeacher/JoinGeustTeacher";
+import Quiz from "../Pages/Quiz-Test/Quiz";
+import ClassTest from "../Pages/Class-Test/ClassTest";
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +28,14 @@ export const router = createBrowserRouter([
       {
         path: "/join-as-guest-teacher",
         element: <JoinGeustTeacher />,
+      },
+      {
+        path: "/quiz-test",
+        element: <Quiz />,
+      },
+      {
+        path: "/class-test",
+        element: <ClassTest />,
       },
       {
         path: "/profile",

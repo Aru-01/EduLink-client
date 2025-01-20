@@ -14,16 +14,22 @@ import ProjectsSkeleton from "../../Components/SkeletonEffect/ProjectsSkeleton";
 const AllProjects = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useContext(AuthContext);
+  // console.log(user?.uid);
   const axiosPublic = useAxiosPublic();
   const handleModalToggle = () => setIsModalOpen(!isModalOpen);
 
-  const { data: projects = [], isLoading } = useQuery({
+  const {
+    data: projects = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
       const res = await axiosPublic.get("/projects");
       return res.data;
     },
   });
+
   // console.log(projects, isLoading);
 
   return (
@@ -37,7 +43,7 @@ const AllProjects = () => {
         </h3>
         {/* post card */}
         <div className="flex justify-center items-center mb-5  bg-slate-100 px-4 py-6 rounded-2xl">
-          <Link to="/profile" >
+          <Link to="/profile">
             <img
               src={user?.photoURL ? user.photoURL : profile}
               alt="user-profile"
@@ -57,7 +63,11 @@ const AllProjects = () => {
           />
         </div>
         {isModalOpen && (
-          <PostProject closeModal={handleModalToggle} user={user} />
+          <PostProject
+            closeModal={handleModalToggle}
+            user={user}
+            refetch={refetch}
+          />
         )}
 
         {isLoading && (
@@ -68,7 +78,11 @@ const AllProjects = () => {
         {/* Project cards go here */}
         <div className="bg-slate-100 py-4 rounded-xl shadow">
           {projects.map((project) => (
-            <ProjectsCard key={project.id} project={project}></ProjectsCard>
+            <ProjectsCard
+              key={project.id}
+              project={project}
+              userId={user.uid}
+            ></ProjectsCard>
           ))}
         </div>
       </div>

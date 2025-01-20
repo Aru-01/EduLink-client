@@ -7,7 +7,7 @@ import Swal from "sweetalert2"; // Import SweetAlert
 import PostSkelteton from "../../Components/SkeletonEffect/PostSkelteton";
 import useAxiosPublic from "../../hooks/useAxios/useAxiosPublic";
 
-const PostProject = ({ closeModal, user }) => {
+const PostProject = ({ closeModal, user, refetch }) => {
   const {
     register,
     handleSubmit,
@@ -51,21 +51,12 @@ const PostProject = ({ closeModal, user }) => {
       createdAt: currentTime,
     };
 
-    // console.log("Project Item:", projectItem); // Log project item
-
     const itemRes = await axiosPublic.post("/projects", projectItem);
-    console.log(itemRes.data);
     if (itemRes.data.insertedId) {
-      Swal.fire({
-        position: "center",
-        icon: "success",
-        title: `${data.title} added successful `,
-        showConfirmButton: false,
-        timer: 1000,
-      });
       setLoading(false);
-      reset(); // Reset form fields after submission
+      reset(); // ফর্মটি রিসেট করুন
       closeModal();
+      await refetch(); // নতুন পোস্ট দেখানোর জন্য refetch কল করুন
     }
   };
 

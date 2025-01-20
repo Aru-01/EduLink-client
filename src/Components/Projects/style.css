@@ -1,0 +1,15 @@
+
+.line {
+    width: 5rem; 
+    height: 0.25rem; 
+    background-color: #BF1A2F; 
+    border-radius: 9999px; 
+    transition: width 0.3s ease; 
+    margin: 0 auto; 
+  }
+  
+  h3:hover + .flex .line {
+    width: 30rem; 
+    background-color: blueviolet;
+  }
+  

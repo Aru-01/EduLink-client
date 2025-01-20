@@ -1,6 +1,7 @@
 import { Card, CardBody, Typography, Button } from "@material-tailwind/react";
 import Container from "../../../Components/Container/Container";
 import img from "../../../assets/why-student-use/why_student.jpg";
+import "../../../Components/Projects/style.css";
 const Why_student = () => {
   return (
     <div>
@@ -13,7 +14,7 @@ const Why_student = () => {
           Why Students Use This
         </Typography>
         <div className="flex justify-center my-4 mb-12">
-          <div className="w-20 h-1 bg-[#BF1A2F] rounded-full"></div>
+          <div className="w-20 line h-1 bg-[#BF1A2F] rounded-full"></div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center font-inria-sans">
           <div className="order-2 lg:order-1">

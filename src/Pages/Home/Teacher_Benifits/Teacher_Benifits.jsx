@@ -1,6 +1,7 @@
 import { Card, CardBody, Typography, Button } from "@material-tailwind/react";
 import Container from "../../../Components/Container/Container";
 import img from "../../../assets/Teacher-benifits/teacher-benifits.jpg";
+import "../../../Components/Projects/style.css";
 const Teacher_Benifits = () => {
   return (
     <div>
@@ -13,7 +14,7 @@ const Teacher_Benifits = () => {
           Teacher Benefits
         </Typography>
         <div className="flex justify-center my-4">
-          <div className="w-20 h-1 bg-[#BF1A2F] rounded-full"></div>
+          <div className="w-20 line h-1 bg-[#BF1A2F] rounded-full"></div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12 items-center">
           <div className="order-1 lg:order-1">
@@ -43,9 +44,7 @@ const Teacher_Benifits = () => {
                   messaging and discussion boards, providing a seamless way to
                   address questions and provide support.
                 </Typography>
-                <Button
-                  className="relative mt-4 p-4  text-base px-5 py-3 overflow-hidden font-medium text-black bg-white border border-black rounded-lg shadow-inner group"
-                >
+                <Button className="relative mt-4 p-4  text-base px-5 py-3 overflow-hidden font-medium text-black bg-white border border-black rounded-lg shadow-inner group">
                   <span className="absolute top-0 left-0 w-0 h-0 transition-all duration-200 border-t-2 border-gray-600 group-hover:w-full ease"></span>
                   <span className="absolute bottom-0 right-0 w-0 h-0 transition-all duration-200 border-b-2 border-gray-600 group-hover:w-full ease"></span>
                   <span className="absolute top-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-gray-600 group-hover:h-full ease"></span>

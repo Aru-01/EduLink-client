@@ -1,46 +1,87 @@
+import { useState, useEffect } from "react";
 import { FaCommentAlt, FaHeart, FaShare } from "react-icons/fa";
 import profile from "../../assets/profile/avater.png";
-import { useState } from "react";
-import { Modal } from "@material-tailwind/react";
 import TimeFormate from "../TimeFormate/TimeFormate";
+import useAxiosPublic from "../../hooks/useAxios/useAxiosPublic";
+import ImgModal from "./ImgModal";
+import CommentModal from "./CommentModal";
 
-const ProjectsCard = ({ project }) => {
+const ProjectsCard = ({ project, userId }) => {
   const [loved, setLoved] = useState(false);
-  const [loveCount, setLoveCount] = useState(project.react);
+  const [loveCount, setLoveCount] = useState(project.react || 0);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState(project.comments || []);
+  const { _id, title, description, img, authorImg, authorName, createdAt } =
+    project;
 
-  const handleLoveClick = () => {
-    if (!loved) {
-      setLoveCount(loveCount + 1);
-      setLoved(true);
-      // Send the love count to the backend to persist the state
-    } else {
-      setLoveCount(loveCount - 1);
-      setLoved(false);
-      // Update the backend to decrease the love count
-    }
-  };
+    const axiosPublic = useAxiosPublic();
+  
+    useEffect(() => {
+      const checkUserReaction = async () => {
+        try {
+          const response = await axiosPublic.get(
+            `/projects/${_id}/check-reaction?userId=${userId}`
+          );
+          setLoved(response.data.hasReacted);
+        } catch (error) {
+          console.error("Error checking reaction:", error);
+        }
+      };
+  
+      checkUserReaction();
+    }, [_id, userId, axiosPublic]);
+  
+    const handleLoveClick = async () => {
+      if (!loved) {
+        try {
+          await axiosPublic.post(`/projects/${_id}/react`, {
+            userId,
+            action: "increment",
+          });
+          setLoveCount(loveCount + 1);
+          setLoved(true);
+        } catch (error) {
+          console.error("Error updating reaction:", error);
+        }
+      } else {
+        try {
+          await axiosPublic.post(`/projects/${_id}/react`, {
+            userId,
+            action: "decrement",
+          });
+          setLoveCount(loveCount - 1);
+          setLoved(false);
+        } catch (error) {
+          console.error("Error updating reaction:", error);
+        }
+      }
+    };
 
   const handleCommentClick = () => {
     setIsCommentModalOpen(true);
   };
 
   const handleImageClick = () => {
+    console.log("Image clicked, opening modal...");
     setIsImageModalOpen(true);
   };
 
   const handleCommentSubmit = async () => {
-    if (comment.trim() !== "") {
-      // Here you would typically send the comment to the backend
+    if (comment.trim() === "") return;
+
+    try {
+      await axiosPublic.post(`/projects/${_id}/comment`, {
+        userId,
+        comment,
+      });
       setComments([...comments, comment]);
       setComment("");
+    } catch (error) {
+      console.error("Error submitting comment:", error);
     }
   };
-
-  const { title, description, img, authorImg, authorName, createdAt } = project;
 
   return (
     <div className="">
@@ -53,15 +94,18 @@ const ProjectsCard = ({ project }) => {
             alt="Avatar"
           />
           <div className="ml-3">
-            <h3 className="text-sm font-bold text-gray-900">{authorName}</h3>
-            <p className="text-xs text-gray-500 font-semibold">{TimeFormate(createdAt)}</p>
+            <h3 className="text-sm font-bold text-gray-900 hover:underline hover:cursor-pointer">
+              {authorName}
+            </h3>
+            <p className="text-xs text-gray-500 font-semibold">
+              {TimeFormate(createdAt)}
+            </p>
           </div>
         </div>
-
         {/* Post Content */}
-        <div className="px-4 py-2 ">
-          <p className="text-gray-900 text-xl font-semibold">{title}</p>
-          <p className="text-gray-700 text-lg font-lora">{description}</p>
+        <div className="px-4 py-2">
+          <p className="text-gray-900 text-lg">{title}</p>
+          <p className="text-gray-700 text-sm">{description}</p>
           {img && (
             <img
               className="mt-2 rounded-lg cursor-pointer"
@@ -75,8 +119,11 @@ const ProjectsCard = ({ project }) => {
         {/* Reactions */}
         <div className="flex justify-between items-center px-4 py-2 bg-gray-100">
           <button
-            className={`flex items-center ${loved ? "text-red-500" : "text-gray-600"} hover:text-red-500`}
+            className={`flex items-center ${
+              loved ? "text-red-500" : "text-gray-600"
+            } hover:text-red-500`}
             onClick={handleLoveClick}
+            disabled={loved} // Prevent multiple clicks if already loved
           >
             <FaHeart className="mr-1" /> Love {loveCount}
           </button>
@@ -92,51 +139,20 @@ const ProjectsCard = ({ project }) => {
         </div>
 
         {/* Comment Modal */}
-        {isCommentModalOpen && (
-          <Modal
-            size="lg"
-            active={isCommentModalOpen}
-            toggler={() => setIsCommentModalOpen(false)}
-          >
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Comments</h3>
-              <div className="space-y-4">
-                {comments.map((cmt, index) => (
-                  <div key={index} className="text-gray-600">
-                    {cmt}
-                  </div>
-                ))}
-                <div className="flex items-center mt-2">
-                  <input
-                    type="text"
-                    placeholder="Add a comment..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    className="mr-2 p-2 border rounded"
-                  />
-                  <button
-                    onClick={handleCommentSubmit}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Post
-                  </button>
-                </div>
-              </div>
-            </div>
-          </Modal>
-        )}
-
+      <CommentModal
+        isOpen={isCommentModalOpen}
+        onClose={() => setIsCommentModalOpen(false)}
+        comments={comments}
+        project={project}
+        onCommentSubmit={handleCommentSubmit}
+      />
         {/* Image Modal */}
         {isImageModalOpen && (
-          <Modal
-            size="lg"
-            active={isImageModalOpen}
-            toggler={() => setIsImageModalOpen(false)}
-          >
-            <div className="flex justify-center items-center p-4">
-              <img src={img} alt="Full Image" className="max-w-full max-h-full" />
-            </div>
-          </Modal>
+          <ImgModal
+            isOpen={isImageModalOpen}
+            onClose={() => setIsImageModalOpen(false)}
+            imgSrc={img}
+          />
         )}
       </div>
     </div>

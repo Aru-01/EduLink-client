@@ -7,6 +7,7 @@ import "./Profile.css";
 import { Helmet } from "react-helmet";
 import StudentPUpdateForm from "../../../Components/ProfileUpdateForm/StudentPUpdateForm";
 import TeacherPUpdateForm from "../../../Components/ProfileUpdateForm/TeacherPUpdateForm";
+import ProjectsCard from "../../../Components/Projects/ProjectsCard";
 
 const Profile = () => {
   const { user } = useContext(AuthContext);
@@ -20,8 +21,25 @@ const Profile = () => {
       return res.data;
     },
   });
+
   const role = dbuser[0]?.role;
-  console.log(role);
+
+  const userMail = user?.email;
+
+  // Fetching user's posts
+  const { data: userPosts = [] } = useQuery({
+    queryKey: ["userPosts", userMail],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/projects`, {
+        params: {
+          authorEmail: userMail,
+        },
+      });
+      return res.data;
+    },
+  });
+
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -223,6 +241,17 @@ const Profile = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Project cards go here */}
+      <div className=" py-4 rounded-xl shadow">
+        {userPosts.map((project) => (
+          <ProjectsCard
+            key={project.id}
+            project={project}
+            userId={user.uid}
+          ></ProjectsCard>
+        ))}
       </div>
       {/* Modal */}
       {isModalOpen && dbuser[0]?.role === "Student" && (
