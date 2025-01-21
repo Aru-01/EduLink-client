@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/LOGO/logo.png";
 import avater from "../../assets/profile/avater.png";
@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 const AfterLoginNav = () => {
   const [showLinks, setShowLinks] = useState(false);
   const [isGlass, setIsGlass] = useState(false);
+  const attendTestRef = useRef(null);
 
   const { user, logOut } = useContext(AuthContext);
   const location = useLocation();
@@ -46,6 +47,12 @@ const AfterLoginNav = () => {
 
   const getLinkClass = (path) => {
     return location.pathname === path ? "text-[#703ee6]" : "";
+  };
+
+  const handleCloseDropdown = () => {
+    if (attendTestRef.current) {
+      attendTestRef.current.removeAttribute("open");
+    }
   };
 
   return (
@@ -143,14 +150,18 @@ const AfterLoginNav = () => {
             </Link>
           </li>
           <li>
-            <details>
+            <details ref={attendTestRef}>
               <summary>Attend Test</summary>
               <ul className="p-2">
                 <li>
-                  <Link to="/quiz-test">Quiz Test</Link>
+                  <Link to="/quiz-test" onClick={handleCloseDropdown}>
+                    Quiz Test
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/class-test">Class Test</Link>
+                  <Link to="/class-test" onClick={handleCloseDropdown}>
+                    Class Test
+                  </Link>
                 </li>
               </ul>
             </details>

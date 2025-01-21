@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/LOGO/logo.png";
 import avater from "../../assets/profile/avater.png";
 const BeforeLoginNav = () => {
   const [showLinks, setShowLinks] = useState(false);
   const [isGlass, setIsGlass] = useState(false);
+  const attendTestRef = useRef(null);
+  
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 0) {
@@ -20,6 +22,11 @@ const BeforeLoginNav = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  const handleCloseDropdown = () => {
+    if (attendTestRef.current) {
+      attendTestRef.current.removeAttribute("open");
+    }
+  };
   return (
     <div
       className={`navbar bg-[#EFF8F2] px-5 font-inria-sans md:py-1 lg:py-2 text-black fixed top-0 left-0 right-0 z-50 shadow-md transition duration-300 ${
@@ -99,16 +106,18 @@ const BeforeLoginNav = () => {
             <Link to="/projects">Projects</Link>
           </li>
           <li>
-            <details>
+          <details ref={attendTestRef}>
               <summary>Attend Test</summary>
               <ul className="p-2">
                 <li>
-                  {" "}
-                  <Link to="/quiz-test">Quiz Test</Link>
+                  <Link to="/quiz-test" onClick={handleCloseDropdown}>
+                    Quiz Test
+                  </Link>
                 </li>
                 <li>
-                  {" "}
-                  <Link to="/class-test">Class Test</Link>
+                  <Link to="/class-test" onClick={handleCloseDropdown}>
+                    Class Test
+                  </Link>
                 </li>
               </ul>
             </details>
