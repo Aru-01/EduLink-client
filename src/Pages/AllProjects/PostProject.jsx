@@ -54,9 +54,9 @@ const PostProject = ({ closeModal, user, refetch }) => {
     const itemRes = await axiosPublic.post("/projects", projectItem);
     if (itemRes.data.insertedId) {
       setLoading(false);
-      reset(); // ফর্মটি রিসেট করুন
+      reset(); 
       closeModal();
-      await refetch(); // নতুন পোস্ট দেখানোর জন্য refetch কল করুন
+      await refetch(); 
     }
   };
 

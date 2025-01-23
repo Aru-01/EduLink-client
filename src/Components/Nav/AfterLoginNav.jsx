@@ -192,12 +192,16 @@ const AfterLoginNav = () => {
               <div className="flex flex-col cursor-pointer">
                 <Link
                   to="/profile"
+                  onClick={() => setShowLinks(false)}
                   className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
                 >
                   Profile
                 </Link>
                 <Link
-                  onClick={handleLogOut}
+                  onClick={() => {
+                    handleLogOut();
+                    setShowLinks(false);
+                  }}
                   className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
                 >
                   Logout

@@ -30,7 +30,7 @@ const AllProjects = () => {
     },
   });
 
-  // console.log(projects, isLoading);
+  console.log(user?.uid);
 
   return (
     <Container>
@@ -51,7 +51,7 @@ const AllProjects = () => {
             />
           </Link>
           <div
-            className="relative flex-grow cursor-pointer bg-gray-200 hover:bg-gray-200 text-black font-bold py-2 px-4 rounded-full transform hover:scale-105 transition-transform"
+            className="relative flex-grow cursor-pointer bg-gray-200 hover:bg-slate-300 text-black font-bold py-2 px-4 rounded-full transform  transition-transform"
             onClick={handleModalToggle}
           >
             <span className="absolute top-0 left-0 w-full h-full bg-gray-200 opacity-50 rounded-full"></span>
@@ -81,7 +81,7 @@ const AllProjects = () => {
             <ProjectsCard
               key={project.id}
               project={project}
-              userId={user.uid}
+              userId={user?.uid}
             ></ProjectsCard>
           ))}
         </div>
